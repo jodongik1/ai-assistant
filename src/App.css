@@ -1,0 +1,42 @@
+/* 1. 전체 컨테이너 설정 */
+#root {
+  max-width: 1280px;      /* 화면 최대 너비 제한 */
+  margin: 0 auto;         /* 가운데 정렬 */
+  padding: 2rem;
+  text-align: center;     /* 모든 텍스트 가운데 정렬 (챗봇 UI에서는 방해가 될 수 있음) */
+}
+
+/* 2. 로고 애니메이션 및 효과 */
+.logo {
+  height: 6em;
+  padding: 1.5em;
+  will-change: filter;
+  transition: filter 300ms;
+}
+.logo:hover {
+  filter: drop-shadow(0 0 2em #646cffaa); /* 호버 시 발광 효과 */
+}
+.logo.react:hover {
+  filter: drop-shadow(0 0 2em #61dafbaa);
+}
+
+/* 로고 회전 애니메이션 */
+@keyframes logo-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  a:nth-of-type(2) .logo {
+    animation: logo-spin infinite 20s linear;
+  }
+}
+
+/* 3. 기타 유틸리티 */
+.card {
+  padding: 2em;
+}
+
+.read-the-docs {
+  color: #888;
+}

@@ -1,0 +1,37 @@
+/* 1. Tailwind CSS v4 엔진 불러오기 */
+/* 이전 버전의 @tailwind base, components, utilities를 이 한 줄로 대체합니다. */
+@import "tailwindcss";
+
+/* 2. 테마 변수 정의 (@theme 블록) */
+/* Tailwind v4에서는 별도의 설정 파일 없이 CSS 내에서 바로 테마 변수를 정의할 수 있습니다. */
+@theme {
+  /* 다크 모드(기본) 색상 정의 */
+  --color-gemini-bg: #131314;     /* 배경색 */
+  --color-gemini-input: #1e1f20;  /* 입력창 배경색 */
+  --color-gemini-text: #e3e3e3;   /* 기본 텍스트 색상 */
+  --color-gemini-border: #333537; /* 경계선 색상 */
+
+  /* 라이트 모드용 후보 색상들 */
+  --color-light-bg: #ffffff;
+  --color-light-input: #f0f2f5;
+  --color-light-text: #1f1f1f;
+  --color-light-border: #e3e3e3;
+}
+
+/* 3. 테마 전환 로직 (라이트 모드) */
+/* HTML 요소에 'light-theme' 클래스가 추가되면 변수 값을 라이트 모드용으로 덮어씁니다. */
+.light-theme {
+  --color-gemini-bg: var(--color-light-bg);
+  --color-gemini-input: var(--color-light-input);
+  --color-gemini-text: var(--color-light-text);
+  --color-gemini-border: var(--color-light-border);
+}
+
+/* 4. 전역 스타일 및 부드러운 전환 효과 */
+body {
+  margin: 0;
+  background-color: var(--color-gemini-bg); /* 위에서 정의한 변수 사용 */
+  color: var(--color-gemini-text);
+  /* 테마 변경 시 배경색과 글자색이 부드럽게 변하도록 애니메이션 추가 */
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
