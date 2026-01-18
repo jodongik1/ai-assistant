@@ -143,7 +143,3 @@ sudo certbot renew --dry-run
 **Developed by Jodongik** | Powered by **M4 Mac Mini** & **MLX**
 
 ---
-
-이 README 파일은 프로젝트의 전체적인 흐름과 보안 설정까지 완벽하게 요약하고 있습니다. 이제 이 내용을 프로젝트 루트 폴더에 저장하시면 됩니다.
-
-혹시 **백엔드(FastAPI) 실행 스크립트(예: PM2 설정)**에 대한 내용도 추가로 필요하신가요?
