@@ -7,9 +7,17 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "cap:copy": "npx cap copy",
+    "cap:open": "npx cap open android",
+    "cap:sync": "npx cap sync",
+    "android:build": "npm run build && npx cap copy",
+    "android:open": "npx cap open android"
   },
   "dependencies": {
+    "@capacitor/android": "^8.0.1",
+    "@capacitor/cli": "^8.0.1",
+    "@capacitor/core": "^8.0.1",
     "@tailwindcss/vite": "^4.1.18",
     "lucide-react": "^0.562.0",
     "react": "^19.2.0",

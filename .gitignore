@@ -2,6 +2,15 @@
 node_modules/
 dist/
 
+# Capacitor 관련
+# Capacitor가 웹 자산을 복사하는 위치는 보통 dist/ 이므로 위에서 처리됨
+# 아래는 iOS/Android 네이티브 프로젝트 내부의 임시 파일들
+/android/build/
+/android/app/build/
+/android/.gradle/
+/android/local.properties
+/android/.idea/
+
 # 환경 변수 (보안을 위해 절대 올리지 마세요)
 .env
 .env.local
@@ -17,3 +26,12 @@ Thumbs.db
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+# Android Studio 및 기타 IDE 설정
+*.iml
+.idea/workspace.xml
+.idea/tasks.xml
+.idea/shelf/
+.idea/dictionaries
+.idea/libraries
+captures/

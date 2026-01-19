@@ -46,6 +46,9 @@ function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [chatHistory, setChatHistory] = useState([]);
   const [currentChatId, setCurrentChatId] = useState(Date.now());
+
+  // 현재 활성화된 채팅의 타이틀을 찾는 로직 추가
+  const currentChatTitle = chatHistory.find(chat => chat.id === currentChatId)?.title || "새 대화";
   
   // 테마 상태 관리 (로컬 스토리지 연동)
   const [isDarkMode, setIsDarkMode] = useState(() => {
@@ -56,7 +59,7 @@ function App() {
   // 사이드바 개폐 상태 관리
   const [isSidebarOpen, setIsSidebarOpen] = useState(() => {
     const savedStatus = localStorage.getItem('sidebar_open');
-    return savedStatus !== null ? JSON.parse(savedStatus) : true;
+    return savedStatus !== null ? JSON.parse(savedStatus) : false; // 기본값을 닫힘으로 설정하는 것이 Overlay 방식에 유리
   });
 
   const scrollRef = useRef(null);
@@ -110,9 +113,12 @@ function App() {
     if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
   }, [messages]);
 
+
+  // 새 채팅 시작 시 사이드바 닫기 추가
   const startNewChat = () => {
     setMessages([]);
     setCurrentChatId(Date.now());
+    setIsSidebarOpen(false); 
   };
 
   const deleteChat = (e, chatId) => {
@@ -175,13 +181,13 @@ function App() {
   };
 
   return (
-    <div className={`h-screen flex overflow-hidden transition-colors duration-300 ${
+    <div className={`h-screen flex overflow-hidden transition-colors duration-300 relative ${
       isDarkMode ? 'bg-gemini-bg text-gemini-text' : 'light-theme bg-gemini-bg text-gemini-text'
     }`}>
       
-      {/* Sidebar: 채팅 내역 관리 */}
-      <aside className={`bg-gray-900 border-r border-gray-800 flex flex-col transition-all duration-300 ${
-        isSidebarOpen ? 'w-72' : 'w-0 overflow-hidden border-none'
+      {/* Sidebar (기존 Overlay 로직 유지) */}
+      <aside className={`fixed inset-y-0 left-0 z-50 bg-gray-900 border-r border-gray-800 flex flex-col transition-transform duration-300 ease-in-out shadow-2xl ${
+        isSidebarOpen ? 'translate-x-0 w-72' : '-translate-x-full w-72'
       }`}>
         <div className="p-4 shrink-0">
           <button onClick={startNewChat} className="w-full flex items-center gap-3 px-4 py-3 bg-gray-800 hover:bg-gray-700 rounded-xl border border-gray-700 text-sm font-medium text-white transition-all active:scale-95">
@@ -193,7 +199,11 @@ function App() {
           {chatHistory.map((chat) => (
             <div 
               key={chat.id} 
-              onClick={() => {setMessages(chat.messages); setCurrentChatId(chat.id);}} 
+              onClick={() => {
+                setMessages(chat.messages); 
+                setCurrentChatId(chat.id);
+                setIsSidebarOpen(false); // 사이드바 닫기
+              }} 
               className={`flex items-center justify-between gap-2 px-3 py-3 rounded-lg text-sm cursor-pointer group ${
                 currentChatId === chat.id ? 'bg-gray-800 text-blue-400' : 'hover:bg-gray-800/40 text-gray-400'
               }`}
@@ -210,23 +220,29 @@ function App() {
         </div>
       </aside>
 
+      {/* Sidebar Overlay */}
+      {isSidebarOpen && (
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-40 transition-opacity" onClick={() => setIsSidebarOpen(false)} />
+      )}
+
       {/* Main Content Area */}
-      <div className="flex-1 flex flex-col relative min-w-0">
+      <div className="flex-1 flex flex-col relative min-w-0 w-full">
+        {/* Header: 타이틀이 동적으로 변경되도록 수정 */}
         <header className="p-4 flex items-center gap-4 border-b border-gemini-border bg-gemini-bg/90 backdrop-blur-xl shrink-0 z-20">
           <button onClick={() => setIsSidebarOpen(!isSidebarOpen)} className="p-2 hover:bg-black/10 dark:hover:bg-white/10 rounded-lg transition-colors">
             <Menu size={22} />
           </button>
-          <div className="flex items-center gap-3 font-medium text-gemini-text">
-            <div className="bg-blue-600 p-1.5 rounded-lg shadow-lg">
-              <Sparkles size={18} className="text-white" />
-            </div>
-            <span>AI Code Assistant</span>
+          <div className="flex items-center gap-3 font-medium text-gemini-text min-w-0 overflow-hidden">
+          
+            {/* 고정 텍스트 대신 현재 채팅의 타이틀 표시 */}
+            <span className="truncate text-sm md:text-base">
+              {messages.length === 0 ? "AI Code Assistant" : currentChatTitle}
+            </span>
           </div>
           
           <button 
             onClick={() => setIsDarkMode(!isDarkMode)} 
             className="ml-auto p-2.5 rounded-xl border border-gemini-border hover:bg-black/5 dark:hover:bg-white/5 transition-all active:scale-90"
-            title={isDarkMode ? "라이트 모드로 전환" : "다크 모드로 전환"}
           >
             {isDarkMode ? <Sun size={20} className="text-yellow-400" /> : <Moon size={20} className="text-blue-600" />}
           </button>
@@ -293,7 +309,7 @@ function App() {
                 }
               }}
             />
-            <div className="flex justify-end p-4 pt-0">
+              <div className="flex justify-end p-4 pt-0">
               {!isLoading ? (
                 <button 
                   type="submit" 
@@ -307,13 +323,19 @@ function App() {
                   <Send size={22} strokeWidth={2.5} />
                 </button>
               ) : (
+                /* 개선된 Stop 버튼: 애니메이션과 더 부드러운 색상 적용 */
                 <button 
                   type="button" 
                   onClick={() => abortControllerRef.current?.abort()} 
-                  className="p-2.5 rounded-xl bg-gray-800 text-red-500 border border-gray-700 flex items-center gap-2 px-4 shadow-xl active:scale-95"
+                  className="group p-2.5 px-5 rounded-2xl bg-gray-100 dark:bg-gray-800 text-red-500 border border-red-200 dark:border-red-900/30 flex items-center gap-2.5 shadow-xl transition-all hover:bg-red-50 dark:hover:bg-red-950/30 active:scale-95"
                 >
-                  <Square size={16} fill="currentColor" /> 
-                  <span className="text-xs font-bold uppercase">Stop</span>
+                  {/* 중단 중임을 알리는 애니메이션 점 */}
+                  <span className="relative flex h-2 w-2">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
+                  </span>
+                  <Square size={14} fill="currentColor" className="group-hover:scale-110 transition-transform" /> 
+                  <span className="text-xs font-bold tracking-wider uppercase">Stop</span>
                 </button>
               )}
             </div>
